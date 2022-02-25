@@ -19,6 +19,7 @@ package com.couchbase.initializer
 import com.github.mustachejava.DefaultMustacheFactory
 import com.github.mustachejava.Mustache
 import com.github.mustachejava.MustacheFactory
+import com.github.mustachejava.util.HtmlEscaper
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -38,15 +39,25 @@ class InitializerController {
     fun sayHello(
         @RequestParam(name = "name", required = false, defaultValue = "Stranger")
         name: String,
+
+        @RequestParam(name = "package", required = false, defaultValue = "com.example.demo")
+        packageName: String,
+
         response: HttpServletResponse,
     ): Unit {
         val archiveFilename = "project.zip"
         response.setHeader("Content-Type", "application/zip")
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
 
-        val root = Paths.get("src/templates/java").absolute().toString() + "/"
+        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties")
 
-        val mf: MustacheFactory = DefaultMustacheFactory(File("src/templates/java"))
+        val templateDir = "src/templates/java/maven"
+
+        val packageAsPathComponents = packageName.replace(".", "/")
+
+        val root = Paths.get(templateDir).absolute().toString() + "/"
+
+        val mf: MustacheFactory = DefaultMustacheFactory(File(templateDir))
 
         val zip = ZipOutputStream(response.outputStream)
         try {
@@ -54,16 +65,27 @@ class InitializerController {
                 if (!file.isFile) return@forEach
 
                 val entryName = file.path.removePrefix(root)
+                    .replace("com/example/demo", packageAsPathComponents)
+
                 zip.putNextEntry(ZipEntry(entryName))
 
-                val mustache = mf.compile(entryName)
-                mustache.execute(zip, mapOf("name" to name))
+//                val content = Files.readAllBytes(file.toPath()).toString(UTF_8)
+//                    .replace("com.example.demo", packageName)
+//                val mustache = mf.compile(StringReader(content), entryName)
 
-//                file.copyTo(zip)
+                if (file.extensionMatches(processExtensions)) {
+                    val mustache = mf.compile(entryName)
+                    mustache.execute(zip, mapOf(
+                        "name" to name,
+                        "package" to packageName,
+                        "meta.group" to "com.example",
+                        "meta.artifact" to "demo",
+                        "meta.javaVersion" to "11",
+                    ))
+                } else {
+                    file.copyTo(zip)
+                }
             }
-
-            //    mapNotNull { if (it.isDirectory) null else it.path.removePrefix(root) }
-
         } finally {
             zip.close()
         }
@@ -80,9 +102,8 @@ private fun File.copyTo(os: OutputStream) {
     inputStream().use { it.copyTo(os) }
 }
 
-//public fun main() {
-//    val mf: MustacheFactory = DefaultMustacheFactory(File("src/templates/java"))
-//    val mustache = mf.compile("src/main/java/com/example/HelloWorld.java")
-//    mustache.execute(PrintWriter(System.out), mapOf("name" to "Stranger")).flush()
-//
-//}
+private fun File.extensionMatches(allowedExtensions: Set<String>): Boolean {
+    val ext = extension
+    return if (ext.isEmpty()) allowedExtensions.contains(name)
+    else allowedExtensions.contains(ext)
+}
