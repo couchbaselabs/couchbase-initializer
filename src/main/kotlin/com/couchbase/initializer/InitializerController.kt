@@ -16,18 +16,24 @@
 
 package com.couchbase.initializer
 
+import com.couchbase.initializer.util.executable
+import com.couchbase.initializer.util.permissions
+import com.couchbase.initializer.util.rwxr_xr_x
 import com.github.mustachejava.DefaultMustacheFactory
 import com.github.mustachejava.Mustache
 import com.github.mustachejava.MustacheFactory
-import com.github.mustachejava.util.HtmlEscaper
+import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
+import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.ResponseBody
-import java.io.*
+import java.io.File
+import java.io.OutputStream
+import java.io.OutputStreamWriter
+import java.io.Writer
 import java.nio.file.Paths
-import java.util.zip.ZipEntry
-import java.util.zip.ZipOutputStream
+import java.util.function.Function
 import javax.servlet.http.HttpServletResponse
 import kotlin.io.path.absolute
 import kotlin.text.Charsets.UTF_8
@@ -57,9 +63,12 @@ class InitializerController {
 
         val root = Paths.get(templateDir).absolute().toString() + "/"
 
-        val mf: MustacheFactory = DefaultMustacheFactory(File(templateDir))
+        val mf: MustacheFactory = object : DefaultMustacheFactory(File(templateDir)) {
+            // Don't HTML-encode stuff.
+            override fun encode(value: String, writer: Writer) = writer.write(value)
+        }
 
-        val zip = ZipOutputStream(response.outputStream)
+        val zip = ZipArchiveOutputStream(response.outputStream)
         try {
             File(root).walk().forEach { file ->
                 if (!file.isFile) return@forEach
@@ -67,29 +76,54 @@ class InitializerController {
                 val entryName = file.path.removePrefix(root)
                     .replace("com/example/demo", packageAsPathComponents)
 
-                zip.putNextEntry(ZipEntry(entryName))
+                val archiveEntry = ZipArchiveEntry(entryName)
+
+                file.permissions?.let { perms ->
+                    // rather than copy the perms, just set the executable bits
+                    if (perms.executable) archiveEntry.unixMode = rwxr_xr_x
+                }
+
+                zip.putArchiveEntry(archiveEntry)
 
 //                val content = Files.readAllBytes(file.toPath()).toString(UTF_8)
 //                    .replace("com.example.demo", packageName)
 //                val mustache = mf.compile(StringReader(content), entryName)
 
+                val scope = mapOf(
+                    "package" to packageName,
+                    "meta.group" to "com.example",
+                    "meta.artifact" to "demo",
+                    "meta.javaVersion" to "11",
+                    "meta.name" to "demo",
+                    "meta.description" to "It's a demo project!",
+
+                    "name" to name,
+                    "\"name\"" to name.quote("\""),
+                    "'name'" to name.quote("'"),
+
+                    "dquote" to Function<String, String> { it.quote("\"") },
+                    "squote" to Function<String, String> { it.quote("'") },
+                )
+
                 if (file.extensionMatches(processExtensions)) {
                     val mustache = mf.compile(entryName)
-                    mustache.execute(zip, mapOf(
-                        "name" to name,
-                        "package" to packageName,
-                        "meta.group" to "com.example",
-                        "meta.artifact" to "demo",
-                        "meta.javaVersion" to "11",
-                    ))
+                    mustache.execute(zip, scope)
                 } else {
                     file.copyTo(zip)
                 }
+
+                zip.closeArchiveEntry()
             }
         } finally {
             zip.close()
         }
     }
+}
+
+fun String.quote(quote: String): String {
+    return quote + this
+        .replace("\\", "\\\\").replace(quote, "\\" + quote)
+        .replace("\r\n", "\\n").replace("\r", "\\n").replace("\n", "\\n") + quote
 }
 
 private fun Mustache.execute(os: OutputStream, scope: Any) {
