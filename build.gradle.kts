@@ -9,7 +9,12 @@ plugins {
 
 group = "com.couchbase"
 version = "0.0.1-SNAPSHOT"
-java.sourceCompatibility = JavaVersion.VERSION_1_8
+
+kotlin {
+	jvmToolchain {
+		(this as JavaToolchainSpec).languageVersion.set(JavaLanguageVersion.of(17))
+	}
+}
 
 repositories {
 	mavenCentral()
@@ -23,9 +28,11 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
 
 	implementation("com.github.spullara.mustache.java:compiler:0.9.10")
 	implementation("org.apache.commons:commons-compress:1.21")
+	implementation("org.apache.commons:commons-text:1.9")
 
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")

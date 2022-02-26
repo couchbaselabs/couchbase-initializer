@@ -24,6 +24,7 @@ import com.github.mustachejava.Mustache
 import com.github.mustachejava.MustacheFactory
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
+import org.apache.commons.text.StringEscapeUtils
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.RequestParam
@@ -63,11 +64,6 @@ class InitializerController {
 
         val root = Paths.get(templateDir).absolute().toString() + "/"
 
-        val mf: MustacheFactory = object : DefaultMustacheFactory(File(templateDir)) {
-            // Don't HTML-encode stuff.
-            override fun encode(value: String, writer: Writer) = writer.write(value)
-        }
-
         val zip = ZipArchiveOutputStream(response.outputStream)
         try {
             File(root).walk().forEach { file ->
@@ -98,14 +94,15 @@ class InitializerController {
                     "meta.description" to "It's a demo project!",
 
                     "name" to name,
-                    "\"name\"" to name.quote("\""),
-                    "'name'" to name.quote("'"),
-
-                    "dquote" to Function<String, String> { it.quote("\"") },
-                    "squote" to Function<String, String> { it.quote("'") },
                 )
 
                 if (file.extensionMatches(processExtensions)) {
+                    val escaper = escapers[file.extensionOrFilename] ?: defaultEscaper
+
+                    val mf: MustacheFactory = object : DefaultMustacheFactory(File(templateDir)) {
+                        override fun encode(value: String, writer: Writer) = writer.write(escaper.apply(value))
+                    }
+
                     val mustache = mf.compile(entryName)
                     mustache.execute(zip, scope)
                 } else {
@@ -120,11 +117,27 @@ class InitializerController {
     }
 }
 
-fun String.quote(quote: String): String {
-    return quote + this
-        .replace("\\", "\\\\").replace(quote, "\\" + quote)
-        .replace("\r\n", "\\n").replace("\r", "\\n").replace("\n", "\\n") + quote
-}
+val escapeXml = Function<String, String> { StringEscapeUtils.escapeXml10(it) }
+val escapeJava = Function<String, String> { StringEscapeUtils.escapeJava(it) }
+val escapeEcmaScript = Function<String, String> { StringEscapeUtils.escapeEcmaScript(it) }
+val escapeHtml = Function<String, String> { StringEscapeUtils.escapeHtml4(it) }
+val escapeNone = Function<String, String> { it }
+
+val escapers = mapOf(
+    "xml" to escapeXml,
+    "java" to escapeJava,
+    "js" to escapeEcmaScript, // Javascript
+    "ts" to escapeEcmaScript, // Typescript
+    "html" to escapeHtml,
+    "properties" to escapeNone,
+
+    // plaintext formats
+    "md" to escapeNone,
+    "adoc" to escapeNone,
+    "txt" to escapeNone,
+    "README" to escapeNone,
+)
+val defaultEscaper = escapeJava // Good enough for most? We'll deal with exceptions as they arise.
 
 private fun Mustache.execute(os: OutputStream, scope: Any) {
     val w = OutputStreamWriter(os, UTF_8)
@@ -132,12 +145,11 @@ private fun Mustache.execute(os: OutputStream, scope: Any) {
     w.flush()
 }
 
-private fun File.copyTo(os: OutputStream) {
-    inputStream().use { it.copyTo(os) }
-}
+private fun File.copyTo(os: OutputStream): Long = inputStream().use { it.copyTo(os) }
 
 private fun File.extensionMatches(allowedExtensions: Set<String>): Boolean {
-    val ext = extension
-    return if (ext.isEmpty()) allowedExtensions.contains(name)
-    else allowedExtensions.contains(ext)
+    return allowedExtensions.contains(extensionOrFilename)
 }
+
+val File.extensionOrFilename: String
+    get() = extension.ifEmpty { name }
