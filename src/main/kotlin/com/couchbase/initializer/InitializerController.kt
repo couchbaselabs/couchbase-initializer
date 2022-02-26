@@ -44,15 +44,21 @@ import kotlin.text.Charsets.UTF_8
 class InitializerController {
     @GetMapping("/download")
     fun sayHello(
-        @RequestParam(name = "name", required = false, defaultValue = "Stranger")
-        name: String,
+        @RequestParam(name = "address", required = false, defaultValue = "127.0.0.1")
+        address: String,
 
         @RequestParam(name = "package", required = false, defaultValue = "com.example.demo")
         packageName: String,
 
+        @RequestParam(name = "username", required = false, defaultValue = "Administrator")
+        username: String,
+
+        @RequestParam(name = "password", required = false, defaultValue = "password")
+        password: String,
+
         response: HttpServletResponse,
     ): Unit {
-        val archiveFilename = "project.zip"
+        val archiveFilename = "hello-couchbase.zip"
         response.setHeader("Content-Type", "application/zip")
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
 
@@ -87,13 +93,14 @@ class InitializerController {
 
                 val scope = mapOf(
                     "package" to packageName,
+                    "address" to address,
+                    "username" to username,
+                    "password" to password,
                     "meta.group" to "com.example",
                     "meta.artifact" to "demo",
                     "meta.javaVersion" to "11",
                     "meta.name" to "demo",
                     "meta.description" to "It's a demo project!",
-
-                    "name" to name,
                 )
 
                 if (file.extensionMatches(processExtensions)) {
