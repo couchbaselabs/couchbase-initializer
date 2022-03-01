@@ -1,0 +1,21 @@
+{
+  "sections" : [
+    {
+      "key": "buildTool",
+      "name": "Build Tool",
+
+      "type": "select",
+      "options": [
+        {
+          "key": "gradle",
+          "name": "Gradle"
+        },
+        {
+          "key": "Maven",
+          "name": "Maven"
+        }
+      ]
+
+    }
+  ],
+}

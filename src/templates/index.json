@@ -1,5 +1,10 @@
 [
   {
-    "id": "java"
+    "key": "java",
+    "name": "Java"
+  },
+  {
+    "key": "node",
+    "name": "Node.js"
   }
 ]

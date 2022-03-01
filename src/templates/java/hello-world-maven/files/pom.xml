@@ -13,6 +13,7 @@
   <description>{{meta.description}}</description>
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.source>{{meta.javaVersion}}</maven.compiler.source>
     <maven.compiler.target>{{meta.javaVersion}}</maven.compiler.target>
 <!--    <maven.compiler.release>{{meta.javaVersion}}</maven.compiler.release>-->
