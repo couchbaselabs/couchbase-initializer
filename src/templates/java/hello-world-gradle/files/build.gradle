@@ -21,7 +21,7 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter:5.8.1'
 
     // This dependency is used by the application.
-    implementation 'com.couchbase.client:java-client:3.2.5'
+    implementation 'com.couchbase.client:java-client:{{sdkVersion}}'
 }
 
 application {

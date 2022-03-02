@@ -85,6 +85,7 @@ class InitializerController {
         val packageAsPathComponents = packageName.replace(".", "/")
         val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties")
         val scope = mapOf(
+            "sdkVersion" to "3.2.5", // todo read this from common.properties
             "package" to packageName,
             "address" to address,
             "username" to username,
