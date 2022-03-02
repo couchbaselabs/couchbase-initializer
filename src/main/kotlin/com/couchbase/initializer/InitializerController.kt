@@ -66,6 +66,9 @@ class InitializerController {
         @RequestParam(name = "password", required = false, defaultValue = "password")
         password: String,
 
+        @RequestParam(name = "template", required = false, defaultValue = "java/hello-world-maven")
+        template: String,
+
         response: HttpServletResponse,
     ): Unit {
         val archiveFilename = "hello-couchbase.zip"
@@ -73,7 +76,10 @@ class InitializerController {
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
 
 
-        val templateDir = "src/templates/java/hello-world-maven"
+        // need to validate this better, but for now...
+        require(!template.contains("..")) {"Invalid template name"}
+
+        val templateDir = "src/templates/$template"
 
 
         val packageAsPathComponents = packageName.replace(".", "/")

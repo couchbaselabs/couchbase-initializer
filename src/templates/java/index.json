@@ -1,5 +1,9 @@
 [
   {
+    "key": "hello-world-gradle",
+    "name": "Hello World (Gradle)"
+  },
+  {
     "key": "hello-world-maven",
     "name": "Hello World (Maven)"
   }
