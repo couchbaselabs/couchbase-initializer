@@ -1,0 +1,4 @@
+[
+  "../mixins/maven-wrapper",
+  "../mixins/hello-world"
+]

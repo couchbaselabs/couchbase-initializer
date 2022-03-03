@@ -3,9 +3,9 @@
 const couchbase = require('couchbase')
 
 async function main() {
-  const cluster = await couchbase.connect('couchbase://127.0.0.1', {
-    username: 'Administrator',
-    password: 'password',
+  const cluster = await couchbase.connect('{{connectionString}}', {
+    username: '{{username}}',
+    password: '{{password}}',
   })
 
   // get a reference to our bucket

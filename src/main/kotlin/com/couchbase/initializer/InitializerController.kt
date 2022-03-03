@@ -61,7 +61,7 @@ class InitializerController(
 ) {
     val manifest = manifestResource.readString()
 
-    @GetMapping("/manifest.json")
+    @GetMapping("/manifest.json", produces = ["application/json"])
     fun manifest(): String = manifest
 
     @GetMapping("/project/{*path}")
@@ -88,12 +88,25 @@ class InitializerController(
         return params.readJsonObject()
     }
 
-    @GetMapping("/download")
+    @RequestMapping(method = [RequestMethod.GET, RequestMethod.POST], path=["/download/{*path}"])
+//    @PostMapping("/download/{*path}")
+//    @GetMapping("/download/{*path}")
     fun download(
+        @PathVariable("path") origPath: String,
         @RequestParam params: Map<String, String>,
         response: HttpServletResponse,
     ): Unit {
+        val path = origPath.removePrefix("/").removeSuffix("/")
+        if (!path.matches(validPath)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
 
+        val template = path
+
+        val address = params.getOrDefault("address", "127.0.0.1")
+        val tls = params.getOrDefault("tls", "false") == "true" || address.endsWith(".cloud.couchbase.com")
+        val connectionStringScheme = if (tls) "couchbases" else "couchbase"
+        val connectionString = "$connectionStringScheme://$address"
 
         val defaults = mapOf(
             "address" to "127.0.0.1",
@@ -101,7 +114,7 @@ class InitializerController(
             "packageSeparator" to ".",
             "username" to "Administrator",
             "password" to "password",
-            "template" to "server/java/hello-world-maven",
+            "connectionString" to connectionString,
 
             "sdkVersion" to "3.2.5", // todo read this from common.properties
 
@@ -115,12 +128,6 @@ class InitializerController(
         val scope = defaults.toMutableMap()
         scope.putAll(params)
 
-        val template = params["template"]!!
-
-        if (!template.matches(validPath)) {
-            throw ResponseStatusException(HttpStatus.NOT_FOUND)
-        }
-
         val archiveFilename = File(template).name + ".zip"
         response.setHeader("Content-Type", "application/zip")
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
@@ -129,10 +136,10 @@ class InitializerController(
         val templateDir = "src/templates/$template"
         val packageSeparator = scope["packageSeparator"]!!
         val packageAsPathComponents = scope["package"]!!.replace(packageSeparator, "/")
-        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties")
+        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties", "gradle")
 
         val root = Paths.get(templateDir).absolute().toString()
-        val mixinsRoot = File("$root/../mixins/").canonicalFile.path
+        val mixinsRoot = File("$root/../").canonicalFile.path
 
         val zip = ZipArchiveOutputStream(response.outputStream)
         try {

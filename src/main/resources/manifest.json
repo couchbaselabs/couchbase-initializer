@@ -14,17 +14,34 @@
           "type": "directory",
           "path": "java",
           "name": "Java",
-          "childSelectionLabel": "Project",
+          "childSelectionLabel": "Framework",
           "children": [
+
             {
-              "type": "project",
-              "path": "hello-world-gradle",
-              "name": "Hello World (Gradle)"
-            },
-            {
-              "type": "project",
-              "path": "hello-world-maven",
-              "name": "Hello World (Maven)"
+              "type": "directory",
+              "path": "basic",
+              "name": "Basic",
+              "childSelectionLabel": "Project",
+              "children": [
+                {
+                  "type": "project",
+                  "path": "hello-world-gradle",
+                  "name": "Hello World (Gradle)"
+                },
+                {
+                  "type": "project",
+                  "path": "hello-world-maven",
+                  "name": "Hello World (Maven)"
+                }
+              ]
+            },  {
+              "type": "directory",
+              "path": "spring-data-couchbase",
+              "name": "Spring Data Couchbase",
+              "childSelectionLabel": "Project",
+              "children": [
+
+              ]
             }
           ]
         },

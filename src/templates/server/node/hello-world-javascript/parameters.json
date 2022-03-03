@@ -1,0 +1,20 @@
+{
+  "sections": [
+    {
+      "key": "couchbase",
+      "name": "Couchbase",
+      "parameters": [
+        {
+          "key": "address",
+          "name": "Address",
+          "defaultValue": "127.0.0.1"
+        },
+        {
+          "key": "username",
+          "name": "Username",
+          "defaultValue": "Administrator"
+        }
+      ]
+    }
+  ]
+}

@@ -1,23 +1,6 @@
 {
   "sections" : [
     {
-      "key": "couchbase",
-      "name": "Couchbase",
-      "parameters": [
-        {
-          "key": "connectionString",
-          "name": "Connection String",
-          "defaultValue": "couchbase://127.0.0.1"
-        },
-        {
-          "key": "username",
-          "name": "Username",
-          "defaultValue": "Administrator"
-        }
-      ]
-    },
-
-    {
       "key": "project",
       "name": "Project",
       "parameters": [
@@ -65,6 +48,22 @@
               "name": "17"
             }
           ]
+        }
+      ]
+    },
+    {
+      "key": "couchbase",
+      "name": "Couchbase",
+      "parameters": [
+        {
+          "key": "address",
+          "name": "Address",
+          "defaultValue": "127.0.0.1"
+        },
+        {
+          "key": "username",
+          "name": "Username",
+          "defaultValue": "Administrator"
         }
       ]
     }

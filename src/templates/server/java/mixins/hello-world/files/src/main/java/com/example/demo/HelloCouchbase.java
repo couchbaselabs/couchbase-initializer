@@ -18,16 +18,7 @@ public class HelloCouchbase {
     String username = "{{username}}";
     String password = "{{password}}";
 
-    Cluster cluster = Cluster.connect(
-        connectionString,
-        clusterOptions(username, password)
-//            .environment(env ->
-//                env.securityConfig()
-//                    .enableTls(true)
-//                    .trustCertificates(SecurityConfig.capellaCertificates()
-//                    )
-            )
-    );
+    Cluster cluster = Cluster.connect(connectionString, username, password);
 
     try {
       // This example assumes the "travel-sample" sample bucket is present.
