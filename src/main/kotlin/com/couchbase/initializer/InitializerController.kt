@@ -19,6 +19,7 @@ package com.couchbase.initializer
 import com.couchbase.initializer.util.executable
 import com.couchbase.initializer.util.permissions
 import com.couchbase.initializer.util.rwxr_xr_x
+import com.fasterxml.jackson.databind.node.ObjectNode
 import com.fasterxml.jackson.module.kotlin.jacksonTypeRef
 import com.github.mustachejava.DefaultMustacheFactory
 import com.github.mustachejava.Mustache
@@ -26,11 +27,10 @@ import com.github.mustachejava.MustacheFactory
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.text.StringEscapeUtils
+import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
-import org.springframework.web.bind.annotation.CrossOrigin
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseBody
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.server.ResponseStatusException
 import java.io.*
 import java.nio.file.Paths
 import java.util.function.Function
@@ -38,67 +38,92 @@ import javax.servlet.http.HttpServletResponse
 import kotlin.io.path.absolute
 import kotlin.text.Charsets.UTF_8
 
-data class ProjectTemplate(
-    val name: String,
-)
+fun File.readJsonObject(): ObjectNode {
+    try {
+        FileInputStream(this).use {
+            return jsonMapper.readTree(it) as ObjectNode
+        }
+    } catch (e: FileNotFoundException) {
+        throw ResponseStatusException(HttpStatus.NOT_FOUND)
+    }
+}
+
+private val validPath = Regex("[a-z][a-z0-9\\-]*(/[a-z][a-z0-9\\-]*)*")
 
 @Controller
 @ResponseBody
 @CrossOrigin
 class InitializerController {
 
-    @GetMapping("/templates")
-    fun templates(): List<ProjectTemplate> {
-        return listOf(ProjectTemplate("foo"))
+    @GetMapping("/project/{*path}")
+    fun project(
+        @PathVariable("path") origPath: String,
+    ): ObjectNode {
+        val path = origPath.removePrefix("/").removeSuffix("/")
+        if (!path.matches(validPath)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        val root = File("src/templates")
+
+        val projectDir = File(root, path)
+        if (!projectDir.exists()) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        val params = File("$projectDir/parameters.json")
+        if (!params.exists()) {
+            return jsonMapper.convertValue(mapOf("sections" to emptyList<Any>()), ObjectNode::class.java)
+        }
+
+        return params.readJsonObject()
     }
 
     @GetMapping("/download")
     fun download(
-        @RequestParam(name = "address", required = false, defaultValue = "127.0.0.1")
-        address: String,
-
-        @RequestParam(name = "package", required = false, defaultValue = "com.example.demo")
-        packageName: String,
-
-        @RequestParam(name = "username", required = false, defaultValue = "Administrator")
-        username: String,
-
-        @RequestParam(name = "password", required = false, defaultValue = "password")
-        password: String,
-
-        @RequestParam(name = "template", required = false, defaultValue = "java/hello-world-maven")
-        template: String,
-
+        @RequestParam params: Map<String, String>,
         response: HttpServletResponse,
     ): Unit {
-        val archiveFilename = "hello-couchbase.zip"
+
+
+        val defaults = mapOf(
+            "address" to "127.0.0.1",
+            "package" to "com.example.demo",
+            "packageSeparator" to ".",
+            "username" to "Administrator",
+            "password" to "password",
+            "template" to "server/java/hello-world-maven",
+
+            "sdkVersion" to "3.2.5", // todo read this from common.properties
+
+            "group" to "com.example",
+            "artifact" to "demo",
+            "javaVersion" to "11",
+            "name" to "demo",
+            "description" to "It's a demo project!",
+        )
+
+        val scope = defaults.toMutableMap();
+        scope.putAll(params)
+
+        val template = params["template"]!!
+
+        if (!template.matches(validPath)) {
+            throw ResponseStatusException(HttpStatus.NOT_FOUND)
+        }
+
+        val archiveFilename = File(template).name + ".zip"
         response.setHeader("Content-Type", "application/zip")
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
 
 
-        // need to validate this better, but for now...
-        require(!template.contains("..")) {"Invalid template name"}
-
         val templateDir = "src/templates/$template"
-
-
-        val packageAsPathComponents = packageName.replace(".", "/")
+        val packageSeparator = scope["packageSeparator"]!!
+        val packageAsPathComponents = scope["package"]!!.replace(packageSeparator, "/")
         val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties")
-        val scope = mapOf(
-            "sdkVersion" to "3.2.5", // todo read this from common.properties
-            "package" to packageName,
-            "address" to address,
-            "username" to username,
-            "password" to password,
-            "meta.group" to "com.example",
-            "meta.artifact" to "demo",
-            "meta.javaVersion" to "11",
-            "meta.name" to "demo",
-            "meta.description" to "It's a demo project!",
-        )
 
-        val root = Paths.get(templateDir).absolute().toString() + "/"
-        val mixinsRoot = File("$root../mixins/").canonicalFile.path + "/"
+        val root = Paths.get(templateDir).absolute().toString()
+        val mixinsRoot = File("$root/../mixins/").canonicalFile.path
 
         val zip = ZipArchiveOutputStream(response.outputStream)
         try {
@@ -109,7 +134,7 @@ class InitializerController {
             if (mixinsFile.exists()) {
                 FileInputStream(mixinsFile).use {
                     val mixins: List<String> = jsonMapper.readValue(it, jacksonTypeRef())
-                    mixins.forEach { mixin -> directoriesToCopy.add(mixinsRoot + mixin) }
+                    mixins.forEach { mixin -> directoriesToCopy.add("$mixinsRoot/$mixin") }
                 }
             }
 
@@ -118,7 +143,6 @@ class InitializerController {
             directoriesToCopy.forEach {
                 zip.addDirectory(File("$it/files").canonicalPath, packageAsPathComponents, processExtensions, scope)
             }
-
 
         } finally {
             zip.close()
@@ -135,7 +159,9 @@ class InitializerController {
         File(root).walk().forEach { file ->
             if (!file.isFile) return@forEach
 
-            val entryName = file.path.removePrefix(root)
+            val entryName = file.path
+                .removePrefix(root)
+                .removePrefix("/")
                 .replace("com/example/demo", packageAsPathComponents)
 
             val archiveEntry = ZipArchiveEntry(entryName)

@@ -3,19 +3,19 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>{{meta.group}}</groupId>
-  <artifactId>{{meta.artifact}}</artifactId>
+  <groupId>{{group}}</groupId>
+  <artifactId>{{artifact}}</artifactId>
   <version>0.0.1-SNAPSHOT</version>
 
   <packaging>jar</packaging>
 
-  <name>{{meta.name}}</name>
-  <description>{{meta.description}}</description>
+  <name>{{name}}</name>
+  <description>{{description}}</description>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.compiler.source>{{meta.javaVersion}}</maven.compiler.source>
-    <maven.compiler.target>{{meta.javaVersion}}</maven.compiler.target>
+    <maven.compiler.source>{{javaVersion}}</maven.compiler.source>
+    <maven.compiler.target>{{javaVersion}}</maven.compiler.target>
 <!--    <maven.compiler.release>{{meta.javaVersion}}</maven.compiler.release>-->
   </properties>
 

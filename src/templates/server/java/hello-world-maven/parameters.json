@@ -1,0 +1,72 @@
+{
+  "sections" : [
+    {
+      "key": "couchbase",
+      "name": "Couchbase",
+      "parameters": [
+        {
+          "key": "connectionString",
+          "name": "Connection String",
+          "defaultValue": "couchbase://127.0.0.1"
+        },
+        {
+          "key": "username",
+          "name": "Username",
+          "defaultValue": "Administrator"
+        }
+      ]
+    },
+
+    {
+      "key": "project",
+      "name": "Project",
+      "parameters": [
+        {
+          "key": "group",
+          "name": "Group",
+          "defaultValue": "com.example"
+        },
+        {
+          "key": "artifact",
+          "name": "Artifact",
+          "defaultValue": "hello-world"
+        },
+        {
+          "key": "name",
+          "name": "Name",
+          "defaultValue": "hello-world"
+        },
+        {
+          "key": "package",
+          "name": "Package",
+          "defaultValue": "com.example.helloworld"
+        },
+        {
+          "key": "packageSeparator",
+          "type": "hidden",
+          "defaultValue": "."
+        },
+        {
+          "key": "javaVersion",
+          "name": "Java",
+          "type": "select",
+          "defaultValue": "1.8",
+          "options": [
+            {
+              "key": "1.8",
+              "name": "8"
+            },
+            {
+              "key": "11",
+              "name": "11"
+            },
+            {
+              "key": "17",
+              "name": "17"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -14,16 +14,18 @@ import static com.couchbase.client.java.ClusterOptions.clusterOptions;
 public class HelloCouchbase {
 
   public static void main(String... args) {
-    String connectionString = "{{address}}";
+    String connectionString = "{{connectionString}}";
     String username = "{{username}}";
     String password = "{{password}}";
 
     Cluster cluster = Cluster.connect(
         connectionString,
         clusterOptions(username, password)
-            .environment(env -> env.securityConfig()
-                .enableTls(true)
-                .trustCertificates(SecurityConfig.capellaCertificates())
+//            .environment(env ->
+//                env.securityConfig()
+//                    .enableTls(true)
+//                    .trustCertificates(SecurityConfig.capellaCertificates()
+//                    )
             )
     );
 

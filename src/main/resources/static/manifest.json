@@ -1,0 +1,81 @@
+{
+  "type": "directory",
+  "path": "",
+  "name": "Root",
+  "childSelectionLabel": "Category",
+  "children": [
+    {
+      "type": "directory",
+      "path": "server",
+      "name": "Server & Capella",
+      "childSelectionLabel": "Language",
+      "children": [
+        {
+          "type": "directory",
+          "path": "java",
+          "name": "Java",
+          "childSelectionLabel": "Project",
+          "children": [
+            {
+              "type": "project",
+              "path": "hello-world-gradle",
+              "name": "Hello World (Gradle)"
+            },
+            {
+              "type": "project",
+              "path": "hello-world-maven",
+              "name": "Hello World (Maven)"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "path": "node",
+          "name": "Node.js",
+          "childSelectionLabel": "Project",
+          "children": [
+            {
+              "type": "project",
+              "path": "hello-world-javascript",
+              "name": "Hello World (Javascript)"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "directory",
+      "path": "connectors",
+      "name": "Connectors",
+      "childSelectionLabel": "Connector",
+      "children": [
+        {
+          "type": "directory",
+          "path": "spark",
+          "name": "Spark",
+          "childSelectionLabel": "Project",
+          "children": [
+            {
+              "type": "project",
+              "path": "hello-world-spark",
+              "name": "Hello World"
+            }
+          ]
+        },
+        {
+          "type": "directory",
+          "path": "Kafka",
+          "name": "kafka",
+          "childSelectionLabel": "Project",
+          "children": [
+            {
+              "type": "project",
+              "path": "custom-source-handler",
+              "name": "Custom SourceHandler"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
