@@ -27,6 +27,9 @@ import com.github.mustachejava.MustacheFactory
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream
 import org.apache.commons.text.StringEscapeUtils
+import org.springframework.beans.factory.annotation.Value
+import org.springframework.core.io.InputStreamSource
+import org.springframework.core.io.Resource
 import org.springframework.http.HttpStatus
 import org.springframework.stereotype.Controller
 import org.springframework.web.bind.annotation.*
@@ -53,7 +56,13 @@ private val validPath = Regex("[a-z][a-z0-9\\-]*(/[a-z][a-z0-9\\-]*)*")
 @Controller
 @ResponseBody
 @CrossOrigin
-class InitializerController {
+class InitializerController(
+    @Value("classpath:manifest.json") manifestResource: Resource,
+) {
+    val manifest = manifestResource.readString()
+
+    @GetMapping("/manifest.json")
+    fun manifest(): String = manifest
 
     @GetMapping("/project/{*path}")
     fun project(
@@ -103,7 +112,7 @@ class InitializerController {
             "description" to "It's a demo project!",
         )
 
-        val scope = defaults.toMutableMap();
+        val scope = defaults.toMutableMap()
         scope.putAll(params)
 
         val template = params["template"]!!
@@ -193,6 +202,12 @@ class InitializerController {
 
             zip.closeArchiveEntry()
         }
+    }
+}
+
+private fun InputStreamSource.readString(): String {
+    inputStream.use {
+        return String(it.readAllBytes(), UTF_8)
     }
 }
 
