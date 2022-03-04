@@ -88,7 +88,7 @@ class InitializerController(
         return params.readJsonObject()
     }
 
-    @RequestMapping(method = [RequestMethod.GET, RequestMethod.POST], path=["/download/{*path}"])
+    @RequestMapping(method = [RequestMethod.GET, RequestMethod.POST], path = ["/download/{*path}"])
 //    @PostMapping("/download/{*path}")
 //    @GetMapping("/download/{*path}")
     fun download(
@@ -136,33 +136,30 @@ class InitializerController(
         val templateDir = "src/templates/$template"
         val packageSeparator = scope["packageSeparator"]!!
         val packageAsPathComponents = scope["package"]!!.replace(packageSeparator, "/")
-        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties", "gradle")
+        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties", "gradle", "js")
 
         val root = Paths.get(templateDir).absolute().toString()
         val mixinsRoot = File("$root/../").canonicalFile.path
 
         val zip = ZipArchiveOutputStream(response.outputStream)
-        try {
 
-            val directoriesToCopy = mutableListOf<String>()
+        val directoriesToCopy = mutableListOf<String>()
 
-            val mixinsFile = File(templateDir, "mixins.json")
-            if (mixinsFile.exists()) {
-                FileInputStream(mixinsFile).use {
-                    val mixins: List<String> = jsonMapper.readValue(it, jacksonTypeRef())
-                    mixins.forEach { mixin -> directoriesToCopy.add("$mixinsRoot/$mixin") }
-                }
+        val mixinsFile = File(templateDir, "mixins.json")
+        if (mixinsFile.exists()) {
+            FileInputStream(mixinsFile).use {
+                val mixins: List<String> = jsonMapper.readValue(it, jacksonTypeRef())
+                mixins.forEach { mixin -> directoriesToCopy.add("$mixinsRoot/$mixin") }
             }
-
-            directoriesToCopy.add(root)
-
-            directoriesToCopy.forEach {
-                zip.addDirectory(File("$it/files").canonicalPath, packageAsPathComponents, processExtensions, scope)
-            }
-
-        } finally {
-            zip.close()
         }
+
+        directoriesToCopy.add(root)
+
+        directoriesToCopy.forEach {
+            zip.addDirectory(File("$it/files").canonicalPath, packageAsPathComponents, processExtensions, scope)
+        }
+
+        zip.close()
     }
 
     private fun ZipArchiveOutputStream.addDirectory(
@@ -175,9 +172,11 @@ class InitializerController(
         File(root).walk().forEach { file ->
             if (!file.isFile) return@forEach
 
-            val entryName = file.path
+            val fileName = file.path
                 .removePrefix(root)
                 .removePrefix("/")
+
+            val entryName = fileName
                 .replace("com/example/demo", packageAsPathComponents)
 
             val archiveEntry = ZipArchiveEntry(entryName)
@@ -201,7 +200,7 @@ class InitializerController(
                     override fun encode(value: String, writer: Writer) = writer.write(escaper.apply(value))
                 }
 
-                val mustache = mf.compile(entryName)
+                val mustache = mf.compile(fileName)
                 mustache.execute(zip, scope)
             } else {
                 file.copyTo(zip)

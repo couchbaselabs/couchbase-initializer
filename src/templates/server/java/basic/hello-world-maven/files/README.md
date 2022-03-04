@@ -1,7 +1,16 @@
 # Hello World
 
-To build this project:
+## Prerequisites
+
+* JDK {{javaVersion}} or later.
+  OpenJDK binaries are available from https://adoptium.net
+
+## Build and Run
+
+Execute this shell command:
 
 ```shell
-./mvnw package
+mvn compile exec:java \
+    -Dexec.mainClass="{{package}}.HelloCouchbase" \
+    -Dexec.cleanupDaemonThreads=false
 ```
