@@ -81,8 +81,8 @@
         },
         {
           "type": "directory",
-          "path": "Kafka",
-          "name": "kafka",
+          "path": "kafka",
+          "name": "Kafka",
           "childSelectionLabel": "Project",
           "children": [
             {
