@@ -29,7 +29,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8")
-
+	implementation("com.github.jknack:handlebars:4.3.0")
 	implementation("com.github.spullara.mustache.java:compiler:0.9.10")
 	implementation("org.apache.commons:commons-compress:1.21")
 	implementation("org.apache.commons:commons-text:1.9")

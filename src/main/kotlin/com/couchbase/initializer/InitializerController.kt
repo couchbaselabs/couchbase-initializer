@@ -132,11 +132,9 @@ class InitializerController(
         response.setHeader("Content-Type", "application/zip")
         response.setHeader("Content-Disposition", "attachment; filename=\"$archiveFilename\"")
 
-
         val templateDir = "src/templates/$template"
         val packageSeparator = scope["packageSeparator"]!!
         val packageAsPathComponents = scope["package"]!!.replace(packageSeparator, "/")
-        val processExtensions = setOf("md", "adoc", "java", "xml", "json", "properties", "gradle", "js")
 
         val root = Paths.get(templateDir).absolute().toString()
         val mixinsRoot = File("$root/../").canonicalFile.path
@@ -156,7 +154,7 @@ class InitializerController(
         directoriesToCopy.add(root)
 
         directoriesToCopy.forEach {
-            zip.addDirectory(File("$it/files").canonicalPath, packageAsPathComponents, processExtensions, scope)
+            zip.addDirectory(File("$it/files").canonicalPath, packageAsPathComponents, scope)
         }
 
         zip.close()
@@ -165,18 +163,21 @@ class InitializerController(
     private fun ZipArchiveOutputStream.addDirectory(
         root: String,
         packageAsPathComponents: String,
-        processExtensions: Set<String>,
         scope: Map<String, String>,
     ) {
         val zip = this
         File(root).walk().forEach { file ->
             if (!file.isFile) return@forEach
 
+            val templateSuffix = ".mustache"
+            val isTemplate = file.path.endsWith(templateSuffix)
+
             val fileName = file.path
                 .removePrefix(root)
                 .removePrefix("/")
 
             val entryName = fileName
+                .removeSuffix(templateSuffix)
                 .replace("com/example/demo", packageAsPathComponents)
 
             val archiveEntry = ZipArchiveEntry(entryName)
@@ -193,8 +194,8 @@ class InitializerController(
             //                val mustache = mf.compile(StringReader(content), entryName)
 
 
-            if (file.extensionMatches(processExtensions)) {
-                val escaper = escapers[file.extensionOrFilename] ?: defaultEscaper
+            if (isTemplate) {
+                val escaper = escapers[File(entryName).extensionOrFilename] ?: defaultEscaper
 
                 val mf: MustacheFactory = object : DefaultMustacheFactory(File(root)) {
                     override fun encode(value: String, writer: Writer) = writer.write(escaper.apply(value))
@@ -219,7 +220,12 @@ private fun InputStreamSource.readString(): String {
 
 val escapeXml = Function<String, String> { StringEscapeUtils.escapeXml10(it) }
 val escapeJava = Function<String, String> { StringEscapeUtils.escapeJava(it) }
-val escapeEcmaScript = Function<String, String> { StringEscapeUtils.escapeEcmaScript(it) }
+val escapeEcmaScript = Function<String, String> {
+    StringEscapeUtils.escapeEcmaScript(it)
+        // special case to avoid ugly connection strings
+        .replace("couchbase:\\/\\/", "couchbase://")
+        .replace("couchbases:\\/\\/", "couchbases://")
+}
 val escapeHtml = Function<String, String> { StringEscapeUtils.escapeHtml4(it) }
 val escapeNone = Function<String, String> { it }
 

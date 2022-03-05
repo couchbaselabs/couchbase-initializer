@@ -40,7 +40,6 @@
               "name": "Spring Data Couchbase",
               "childSelectionLabel": "Project",
               "children": [
-
               ]
             }
           ]
@@ -49,12 +48,33 @@
           "type": "directory",
           "path": "node",
           "name": "Node.js",
-          "childSelectionLabel": "Project",
+          "childSelectionLabel": "Framework",
           "children": [
+
             {
-              "type": "project",
-              "path": "hello-world-javascript",
-              "name": "Hello World (Javascript)"
+              "type": "directory",
+              "path": "basic",
+              "name": "Basic",
+              "childSelectionLabel": "Project",
+              "children": [
+                {
+                  "type": "project",
+                  "path": "hello-world-javascript",
+                  "name": "Hello World (Javascript)"
+                }
+              ]
+            },  {
+              "type": "directory",
+              "path": "ottoman",
+              "name": "Ottoman",
+              "childSelectionLabel": "Project",
+              "children": [
+                {
+                  "type": "project",
+                  "path": "hello-world-ottoman",
+                  "name": "Hello World Ottoman"
+                }
+              ]
             }
           ]
         }
@@ -89,9 +109,22 @@
               "type": "project",
               "path": "custom-source-handler",
               "name": "Custom SourceHandler"
+            },
+            {
+              "type": "project",
+              "path": "single-message-transform",
+              "name": "Single Message Transform (SMT)"
             }
           ]
         }
+      ]
+    },
+    {
+      "type": "directory",
+      "path": "mobile",
+      "name": "Mobile",
+      "childSelectionLabel": "Project",
+      "children": [
       ]
     }
   ]

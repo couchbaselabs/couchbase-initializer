@@ -1,0 +1,41 @@
+{
+  "sections": [
+    {
+      "key": "project",
+      "name": "Project",
+      "parameters": [
+        {
+          "key": "name",
+          "name": "Name",
+          "defaultValue": "hello-world"
+        },
+        {
+          "key": "description",
+          "name": "Description",
+          "defaultValue": "Starter project"
+        },
+        {
+          "key": "license",
+          "name": "License",
+          "defaultValue": "ISC"
+        }
+      ]
+    },
+    {
+      "key": "couchbase",
+      "name": "Couchbase",
+      "parameters": [
+        {
+          "key": "address",
+          "name": "Address",
+          "defaultValue": "127.0.0.1"
+        },
+        {
+          "key": "username",
+          "name": "Username",
+          "defaultValue": "Administrator"
+        }
+      ]
+    }
+  ]
+}
