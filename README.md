@@ -19,5 +19,5 @@ Build and run:
 
 For the fancy UI, visit http://localhost:8080
 
-More information at http://localhost:8080/backend-index.html
+More info at http://localhost:8080/backend.html
 
