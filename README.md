@@ -1,4 +1,4 @@
-# Couchbase Initializer PoC Backend
+# Couchbase Initializer PoC
 
 Experimental, unsupported.
 
