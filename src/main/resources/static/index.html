@@ -1,7 +1,16 @@
 <html>
 <body>
-<h1>Couchbase Initializer</h1>
+<h1>Couchbase Initializer PoC Backend</h1>
 
+The fancy UI requires Node.js.
+Clone the <a href="https://github.com/daschl/initializer-ui">front-end repo</a>
+and run:
+<pre>
+  npm install ng
+  ng serve
+</pre>
+
+Then go to <a href="http://localhost:4200">http://localhost:4200</a>.
 
 <h2>Project Summaries</h2>
 
@@ -12,16 +21,30 @@
 <ul>
   <li><a href="project/server/java/basic/hello-world-maven">Java Hello World (Maven)</a>
   <li><a href="project/server/java/basic/hello-world-gradle">Java Hello World (Gradle)</a>
-  <li><a href="project/server/node/hello-world-javascript">Node.js Hello World (Javascript)</a>
+  <li><a href="project/server/node/basic/hello-world-javascript">Node.js Hello World (Javascript)</a>
 </ul>
 
 <h2>Download</h2>
+
+These links use default values for all parameters.
+
 <ul>
   <li><a href="download/server/java/basic/hello-world-maven">Java Hello World (Maven)</a>
   <li><a href="download/server/java/basic/hello-world-gradle">Java Hello World (Gradle)</a>
-  <li><a href="download/server/node/hello-world-javascript">Node.js Hello World (Javascript)</a>
+  <li><a href="download/server/node/basic/hello-world-javascript">Node.js Hello World (Javascript)</a>
 </ul>
-For now, pass template parameters as query string parameters.
+
+
+To specify parameter values, use a GET request with query parameters,
+or a POST request with form data.
+
+Example curl command:
+
+<pre>
+curl -X POST http://localhost:8080/download/server/node/basic/hello-world-javascript \
+  --remote-name --remote-header-name \
+  -d address=example.cloud.couchbase.com
+</pre>
 
 </body>
 </html>
