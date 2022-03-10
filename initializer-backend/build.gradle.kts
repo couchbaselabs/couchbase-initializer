@@ -34,6 +34,8 @@ dependencies {
 	implementation("org.apache.commons:commons-compress:1.21")
 	implementation("org.apache.commons:commons-text:1.9")
 
+	implementation(project(":initializer-ui"))
+
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("io.projectreactor:reactor-test")
 }

@@ -140,7 +140,7 @@ val HttpResponse<String>.json: JsonNode
             TextNode(body())
         }
 
-val jsonMapper = jsonMapper { addModule(KotlinModule()) }
+val jsonMapper = jsonMapper { addModule(KotlinModule.Builder().build()) }
 
 fun urlEncode(s: String): String {
     return try {

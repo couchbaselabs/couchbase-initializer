@@ -1,0 +1,31 @@
+div.inline-select {
+    display: inline;
+    margin-right: 20px;
+}
+
+code {
+    background-color: #F3F3F3;
+}
+
+
+div.meta-holder {
+    display: flex;
+}
+
+div.meta-box {
+    margin-right: 20px;
+}
+
+mat-card {
+    margin-bottom: 20px;
+}
+
+div.submit button {
+    font-size: 16px;
+}
+
+div.submit button.primary {
+    background-color: #4287D6;
+    margin-right: 10px;
+    color: #fff;
+}

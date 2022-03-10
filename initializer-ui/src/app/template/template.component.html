@@ -1,0 +1,89 @@
+<form [formGroup]="templateForm">
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>1. Select Language</mat-card-title>
+            <mat-card-subtitle>Pick a programming language of your choice to display all available projects.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div formArrayName="languages">
+                <div *ngFor="let language of languages; let i = index" [formGroupName]="i" class="inline-select">
+                    <mat-form-field appearance="fill">
+                        <mat-label>{{ language.groupName }}</mat-label>
+                        <mat-select formControlName="entry">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let l of language.languages" [value]="language.groupKey + '.' + l.key">
+                                {{ l.value }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>2. Select Project</mat-card-title>
+            <mat-card-subtitle>Pick a sample project based on a framework or toolset of choice.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div formArrayName="projects">
+                <div *ngFor="let project of projects; let i = index" [formGroupName]="i" class="inline-select">
+                    <mat-form-field appearance="fill">
+                        <mat-label>{{ project.groupName }}</mat-label>
+                        <mat-select formControlName="entry">
+                            <mat-option>None</mat-option>
+                            <mat-option *ngFor="let p of project.projects" [value]="project.groupKey + '.' + p.key">
+                                {{ p.value }}
+                            </mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <mat-card>
+        <mat-card-header>
+            <mat-card-title>3. Configure Optional Metadata</mat-card-title>
+            <mat-card-subtitle>Optional metadata allows to resolve placeholders already and get to a running application
+                more quickly.
+            </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+            <div formArrayName="metadata" class="meta-holder">
+                <div *ngFor="let mf of metadata; let i = index" [formGroupName]="i" class="meta-box">
+                    <h3>{{ mf.groupName }}</h3>
+                    <div *ngFor="let field of mf.fields">
+                        <div *ngIf="field.type != 'hidden'">
+                            <mat-form-field appearance="fill">
+                                <mat-label>{{field.name}}</mat-label>
+                                <div [ngSwitch]="field.type">
+                                    <input *ngSwitchCase="'input'" matInput [formControlName]="field.key" />
+                                    <input *ngSwitchDefault matInput [formControlName]="field.key" />
+                                    <mat-select [formControlName]="field.key" [value]="field.defaultValue"
+                                        *ngSwitchCase="'select'">
+                                        <mat-option>None</mat-option>
+                                        <mat-option *ngFor="let option of field.options" [value]="option.key">
+                                            {{ option.name }}
+                                        </mat-option>
+                                    </mat-select>
+                                </div>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </mat-card-content>
+    </mat-card>
+
+    <div class="submit">
+        <button mat-raised-button color="primary" class="primary" (click)="initiateDownload()">Package &amp;
+            Download</button>
+        <!--<button mat-raised-button disabled class="explore">Explore</button>-->
+    </div>
+
+</form>

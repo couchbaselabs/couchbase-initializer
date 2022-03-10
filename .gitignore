@@ -1,5 +1,9 @@
 Sandbox.kt
 
+.angular
+node_modules
+initializer-ui/dist
+
 .gradle
 build/
 !gradle/wrapper/gradle-wrapper.jar
