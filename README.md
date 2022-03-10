@@ -21,3 +21,5 @@ For the fancy UI, visit http://localhost:8080
 
 More info at http://localhost:8080/backend.html
 
+Templates are defined [here](initializer-backend/src/templates).
+Only `server/java/basic/*` and `server/node/basic/*` are "real" -- the others are placeholders.
