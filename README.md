@@ -5,6 +5,7 @@ Experimental, unsupported.
 ## Prerequisites
 
 * Java 1.8 or later.
+* Angular CLI (`ng`)
 
 ## Build and run
 
