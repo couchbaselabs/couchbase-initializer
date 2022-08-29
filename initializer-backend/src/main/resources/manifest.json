@@ -34,13 +34,6 @@
                   "name": "Hello World (Maven)"
                 }
               ]
-            },  {
-              "type": "directory",
-              "path": "spring-data-couchbase",
-              "name": "Spring Data Couchbase",
-              "childSelectionLabel": "Project",
-              "children": [
-              ]
             }
           ]
         },
@@ -63,68 +56,9 @@
                   "name": "Hello World (Javascript)"
                 }
               ]
-            },  {
-              "type": "directory",
-              "path": "ottoman",
-              "name": "Ottoman",
-              "childSelectionLabel": "Project",
-              "children": [
-                {
-                  "type": "project",
-                  "path": "hello-world-ottoman",
-                  "name": "Hello World Ottoman"
-                }
-              ]
             }
           ]
         }
-      ]
-    },
-    {
-      "type": "directory",
-      "path": "connectors",
-      "name": "Connectors",
-      "childSelectionLabel": "Connector",
-      "children": [
-        {
-          "type": "directory",
-          "path": "spark",
-          "name": "Spark",
-          "childSelectionLabel": "Project",
-          "children": [
-            {
-              "type": "project",
-              "path": "hello-world-spark",
-              "name": "Hello World"
-            }
-          ]
-        },
-        {
-          "type": "directory",
-          "path": "kafka",
-          "name": "Kafka",
-          "childSelectionLabel": "Project",
-          "children": [
-            {
-              "type": "project",
-              "path": "custom-source-handler",
-              "name": "Custom SourceHandler"
-            },
-            {
-              "type": "project",
-              "path": "single-message-transform",
-              "name": "Single Message Transform (SMT)"
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "type": "directory",
-      "path": "mobile",
-      "name": "Mobile",
-      "childSelectionLabel": "Project",
-      "children": [
       ]
     }
   ]
