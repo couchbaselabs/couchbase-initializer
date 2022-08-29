@@ -116,7 +116,7 @@ class InitializerController(
             "password" to "password",
             "connectionString" to connectionString,
 
-            "sdkVersion" to "3.2.5", // todo read this from common.properties
+            "sdkVersion" to "3.3.3", // todo read this from common.properties
 
             "group" to "com.example",
             "artifact" to "demo",
