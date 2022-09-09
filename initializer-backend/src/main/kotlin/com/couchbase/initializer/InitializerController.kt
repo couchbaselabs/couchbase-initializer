@@ -117,6 +117,7 @@ class InitializerController(
             "connectionString" to connectionString,
 
             "sdkVersion" to "3.3.3", // todo read this from common.properties
+            "log4jVersion" to "2.18.0",
 
             "group" to "com.example",
             "artifact" to "demo",

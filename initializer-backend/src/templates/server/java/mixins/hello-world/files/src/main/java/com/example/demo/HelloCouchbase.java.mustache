@@ -1,17 +1,21 @@
 package {{&package}};
 
-import com.couchbase.client.core.env.SecurityConfig;
+import com.couchbase.client.core.error.DocumentNotFoundException;
 import com.couchbase.client.java.Bucket;
 import com.couchbase.client.java.Cluster;
 import com.couchbase.client.java.Collection;
 import com.couchbase.client.java.kv.GetResult;
 import com.couchbase.client.java.query.QueryResult;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.time.Duration;
 
 import static com.couchbase.client.java.ClusterOptions.clusterOptions;
 
 public class HelloCouchbase {
+  private static final Logger logger = LoggerFactory.getLogger(HelloCouchbase.class);
 
   public static void main(String... args) {
     String connectionString = "{{connectionString}}";
@@ -29,11 +33,19 @@ public class HelloCouchbase {
       QueryResult queryResult = cluster.query(
           "select * from `travel-sample` where type = 'airline' limit 5"
       );
-      queryResult.rowsAsObject().forEach(System.out::println);
+      queryResult.rowsAsObject().forEach(row ->
+          logger.info("Query result row: {}", row)
+      );
 
-      Collection collection = bucket.defaultCollection();
-      GetResult getResult = collection.get("airline_10");
-      System.out.println(getResult);
+      String documentId = "airline_10";
+      try {
+        Collection collection = bucket.defaultCollection();
+        GetResult getResult = collection.get(documentId);
+        logger.info("KV GetResult: {}", getResult);
+
+      } catch (DocumentNotFoundException e) {
+        logger.warn("Document {} not found.", documentId, e);
+      }
 
     } finally {
       cluster.disconnect();
