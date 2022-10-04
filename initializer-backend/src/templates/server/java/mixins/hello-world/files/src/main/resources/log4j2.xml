@@ -2,7 +2,7 @@
 <Configuration status="WARN">
   <Appenders>
     <Console name="Console" target="SYSTEM_OUT">
-      <PatternLayout pattern="%d{HH:mm:ss} %-5p [%c:%L] %m%n"/>
+      <PatternLayout pattern="%d{ISO8601_OFFSET_DATE_TIME_HHCMM} %-5p [%c:%L] %m%n"/>
     </Console>
   </Appenders>
   <Loggers>
